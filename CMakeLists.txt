@@ -36,3 +36,11 @@ catch_discover_tests(bank_tests)
 
 add_executable(Banking src/main.cpp ${BANK_SOURCES})
 target_include_directories(Banking PRIVATE src)
+
+# === Web Server ===
+set(WEBSERVER_SOURCES
+    src/WebServer.cpp
+)
+
+add_executable(BankingWeb src/web_main.cpp ${BANK_SOURCES} ${WEBSERVER_SOURCES})
+target_include_directories(BankingWeb PRIVATE src)

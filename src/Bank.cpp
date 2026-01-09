@@ -93,9 +93,9 @@ void Bank::appendTransaction(const std::string& accountNumber, TransactionType t
     double currentBalance = getBalance(accountNumber);
     double newBalance = currentBalance;
     
-    if (type == TransactionType::DEPOSIT) {
+    if (type == TransactionType::DEPOSIT || type == TransactionType::TRANSFER_IN) {
         newBalance += amount;
-    } else if (type == TransactionType::DEBIT) {
+    } else if (type == TransactionType::DEBIT || type == TransactionType::TRANSFER_OUT) {
         newBalance -= amount;
     }
 
@@ -103,6 +103,8 @@ void Bank::appendTransaction(const std::string& accountNumber, TransactionType t
     switch (type) {
         case TransactionType::DEPOSIT: typeStr = "DEPOSIT"; break;
         case TransactionType::DEBIT: typeStr = "DEBIT"; break;
+        case TransactionType::TRANSFER_IN: typeStr = "TRANSFER_IN"; break;
+        case TransactionType::TRANSFER_OUT: typeStr = "TRANSFER_OUT"; break;
         case TransactionType::ACCOUNT_CREATED: typeStr = "ACCOUNT_CREATED"; break;
     }
 
@@ -308,6 +310,38 @@ std::string Bank::listAccounts(const std::string& sessionId) {
         return "error: unauthorized";
     }
     return getBankStatus();
+}
+
+std::string Bank::transfer(const std::string& sessionId, const std::string& toAccountNumber, double amount) {
+    std::string fromAccountNumber = getAccountFromSession(sessionId);
+    if (fromAccountNumber.empty()) {
+        return "error: invalid session";
+    }
+    
+    if (amount <= 0) {
+        return "error: amount must be positive";
+    }
+    
+    if (!accountExists(toAccountNumber)) {
+        return "error: destination account does not exist";
+    }
+    
+    if (fromAccountNumber == toAccountNumber) {
+        return "error: cannot transfer to same account";
+    }
+    
+    double balance = getBalance(fromAccountNumber);
+    if (amount > balance) {
+        return "error: insufficient funds";
+    }
+
+    // Debit from source account
+    appendTransaction(fromAccountNumber, TransactionType::TRANSFER_OUT, amount);
+    
+    // Credit to destination account
+    appendTransaction(toAccountNumber, TransactionType::TRANSFER_IN, amount);
+    
+    return "ok";
 }
 
 } // namespace Banking

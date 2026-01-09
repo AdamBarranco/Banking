@@ -57,6 +57,9 @@ public:
 
     // List accounts (admin only)
     std::string listAccounts(const std::string& sessionId);
+
+    // Transfer money between accounts (customer)
+    std::string transfer(const std::string& sessionId, const std::string& toAccountNumber, double amount);
 };
 
 } // namespace Banking

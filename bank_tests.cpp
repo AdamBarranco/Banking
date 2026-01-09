@@ -1,8 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
-#include "bank.h"
+#include "Bank.h"
 
 namespace fs = std::filesystem;
+
+using Banking::Bank;
 
 // Helper to clean up test data
 class TestFixture {
@@ -178,5 +180,71 @@ TEST_CASE("Bank") {
         
         std::string result = bank.createAccount(adminSession, "12345678", "ab12");
         CHECK(result == "error: pin must contain only digits");
+    }
+    
+    SECTION("Customer can transfer money to another account") {
+        std::string adminSession = bank.login("00000000", "9999");
+        bank.createAccount(adminSession, "12345678", "1234");
+        bank.createAccount(adminSession, "87654321", "4321");
+        
+        std::string customer1Session = bank.login("12345678", "1234");
+        bank.deposit(customer1Session, 500.00);
+        
+        std::string result = bank.transfer(customer1Session, "87654321", 200.00);
+        CHECK(result == "ok");
+        
+        // Check statements show transfer
+        std::string statement1 = bank.getStatement(customer1Session, 10);
+        CHECK(statement1.find("TRANSFER_OUT") != std::string::npos);
+        
+        std::string customer2Session = bank.login("87654321", "4321");
+        std::string statement2 = bank.getStatement(customer2Session, 10);
+        CHECK(statement2.find("TRANSFER_IN") != std::string::npos);
+    }
+    
+    SECTION("Cannot transfer more than balance") {
+        std::string adminSession = bank.login("00000000", "9999");
+        bank.createAccount(adminSession, "12345678", "1234");
+        bank.createAccount(adminSession, "87654321", "4321");
+        
+        std::string customerSession = bank.login("12345678", "1234");
+        bank.deposit(customerSession, 100.00);
+        
+        std::string result = bank.transfer(customerSession, "87654321", 200.00);
+        CHECK(result == "error: insufficient funds");
+    }
+    
+    SECTION("Cannot transfer to non-existent account") {
+        std::string adminSession = bank.login("00000000", "9999");
+        bank.createAccount(adminSession, "12345678", "1234");
+        
+        std::string customerSession = bank.login("12345678", "1234");
+        bank.deposit(customerSession, 100.00);
+        
+        std::string result = bank.transfer(customerSession, "99999999", 50.00);
+        CHECK(result == "error: destination account does not exist");
+    }
+    
+    SECTION("Cannot transfer to same account") {
+        std::string adminSession = bank.login("00000000", "9999");
+        bank.createAccount(adminSession, "12345678", "1234");
+        
+        std::string customerSession = bank.login("12345678", "1234");
+        bank.deposit(customerSession, 100.00);
+        
+        std::string result = bank.transfer(customerSession, "12345678", 50.00);
+        CHECK(result == "error: cannot transfer to same account");
+    }
+    
+    SECTION("Cannot transfer negative amount") {
+        std::string adminSession = bank.login("00000000", "9999");
+        bank.createAccount(adminSession, "12345678", "1234");
+        bank.createAccount(adminSession, "87654321", "4321");
+        
+        std::string customerSession = bank.login("12345678", "1234");
+        bank.deposit(customerSession, 100.00);
+        
+        std::string result = bank.transfer(customerSession, "87654321", -50.00);
+        CHECK(result == "error: amount must be positive");
     }
 }

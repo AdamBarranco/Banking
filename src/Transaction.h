@@ -9,6 +9,8 @@ namespace Banking {
 enum class TransactionType {
     DEPOSIT,
     DEBIT,
+    TRANSFER_IN,
+    TRANSFER_OUT,
     ACCOUNT_CREATED
 };
 

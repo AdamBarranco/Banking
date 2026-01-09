@@ -15,8 +15,7 @@ FetchContent_MakeAvailable(Catch2)
 # === Unit tests ===
 enable_testing()
 
-add_executable(bank_tests bank_tests.cpp
-        bank_tests.cpp)
+add_executable(bank_tests bank_tests.cpp)
 target_link_libraries(bank_tests PRIVATE Catch2::Catch2WithMain)
 
 include(Catch)

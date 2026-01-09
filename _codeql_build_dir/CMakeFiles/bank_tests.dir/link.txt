@@ -1,1 +1,0 @@
-/home/runner/work/Banking/.codeql-scratch/dbs/cpp/working/autobuild/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/bank_tests.dir/link.d CMakeFiles/bank_tests.dir/bank_tests.cpp.o -o bank_tests  _deps/catch2-build/src/libCatch2Main.a _deps/catch2-build/src/libCatch2.a

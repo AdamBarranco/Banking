@@ -1,5 +1,0 @@
-if(EXISTS "/home/runner/work/Banking/Banking/_codeql_build_dir/bank_tests-b12d07c_tests.cmake")
-  include("/home/runner/work/Banking/Banking/_codeql_build_dir/bank_tests-b12d07c_tests.cmake")
-else()
-  add_test(bank_tests_NOT_BUILT-b12d07c bank_tests_NOT_BUILT-b12d07c)
-endif()

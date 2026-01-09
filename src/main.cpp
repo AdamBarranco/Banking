@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-#include "bank.h"
+#include "Bank.h"
 
 void printHelp() {
     std::cout << "Banking Console Application\n";
@@ -14,6 +14,7 @@ void printHelp() {
     std::cout << "  create_account <session_id> <account> <pin> - Create new account (admin only)\n";
     std::cout << "  deposit <session_id> <amount>        - Deposit money\n";
     std::cout << "  debit <session_id> <amount>          - Withdraw money\n";
+    std::cout << "  transfer <session_id> <to_account> <amount> - Transfer money to another account\n";
     std::cout << "  statement <session_id> [lines]       - View account statement\n";
     std::cout << "  list_accounts <session_id>           - List all accounts (admin only)\n";
     std::cout << "  help                                 - Show this help\n";
@@ -33,7 +34,7 @@ std::vector<std::string> parseCommand(const std::string& input) {
 }
 
 int main() {
-    Bank bank;
+    Banking::Bank bank;
     std::string line;
     
     std::cout << "Banking Console Application\n";
@@ -111,6 +112,20 @@ int main() {
             try {
                 double amount = std::stod(tokens[2]);
                 std::cout << bank.debit(tokens[1], amount) << "\n";
+            } catch (const std::invalid_argument&) {
+                std::cout << "error: invalid amount format\n";
+            } catch (const std::out_of_range&) {
+                std::cout << "error: amount out of range\n";
+            }
+        }
+        else if (cmd == "transfer") {
+            if (tokens.size() < 4) {
+                std::cout << "error: usage: transfer <session_id> <to_account> <amount>\n";
+                continue;
+            }
+            try {
+                double amount = std::stod(tokens[3]);
+                std::cout << bank.transfer(tokens[1], tokens[2], amount) << "\n";
             } catch (const std::invalid_argument&) {
                 std::cout << "error: invalid amount format\n";
             } catch (const std::out_of_range&) {

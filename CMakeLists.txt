@@ -3,6 +3,17 @@ project(Banking VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# === Source files ===
+set(BANK_SOURCES
+    src/Bank.cpp
+)
+
+set(BANK_HEADERS
+    src/Bank.h
+    src/Constants.h
+    src/Transaction.h
+)
+
 # === Catch2 setup via FetchContent ===
 include(FetchContent)
 FetchContent_Declare(
@@ -15,11 +26,13 @@ FetchContent_MakeAvailable(Catch2)
 # === Unit tests ===
 enable_testing()
 
-add_executable(bank_tests bank_tests.cpp)
+add_executable(bank_tests bank_tests.cpp ${BANK_SOURCES})
+target_include_directories(bank_tests PRIVATE src)
 target_link_libraries(bank_tests PRIVATE Catch2::Catch2WithMain)
 
 include(Catch)
 catch_discover_tests(bank_tests)
 
 
-add_executable(Banking main.cpp)
+add_executable(Banking src/main.cpp ${BANK_SOURCES})
+target_include_directories(Banking PRIVATE src)

@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <ctime>
 #include <chrono>
+#include <cctype>
 
 namespace fs = std::filesystem;
 
@@ -204,8 +205,22 @@ public:
             return "error: account number must be 8 digits";
         }
         
+        // Verify account number contains only digits
+        for (char c : accountNumber) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                return "error: account number must contain only digits";
+            }
+        }
+        
         if (pin.length() != 4) {
             return "error: pin must be 4 digits";
+        }
+        
+        // Verify PIN contains only digits
+        for (char c : pin) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                return "error: pin must contain only digits";
+            }
         }
         
         if (accountExists(accountNumber)) {

@@ -165,4 +165,18 @@ TEST_CASE("Bank") {
         std::string result = bank.createAccount(adminSession, "12345678", "5678");
         CHECK(result == "error: account already exists");
     }
+    
+    SECTION("Account number must contain only digits") {
+        std::string adminSession = bank.login("00000000", "9999");
+        
+        std::string result = bank.createAccount(adminSession, "abcd1234", "1234");
+        CHECK(result == "error: account number must contain only digits");
+    }
+    
+    SECTION("Pin must contain only digits") {
+        std::string adminSession = bank.login("00000000", "9999");
+        
+        std::string result = bank.createAccount(adminSession, "12345678", "ab12");
+        CHECK(result == "error: pin must contain only digits");
+    }
 }

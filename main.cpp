@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 #include "bank.h"
 
 void printHelp() {
@@ -96,8 +97,10 @@ int main() {
             try {
                 double amount = std::stod(tokens[2]);
                 std::cout << bank.deposit(tokens[1], amount) << "\n";
-            } catch (...) {
-                std::cout << "error: invalid amount\n";
+            } catch (const std::invalid_argument&) {
+                std::cout << "error: invalid amount format\n";
+            } catch (const std::out_of_range&) {
+                std::cout << "error: amount out of range\n";
             }
         }
         else if (cmd == "debit") {
@@ -108,8 +111,10 @@ int main() {
             try {
                 double amount = std::stod(tokens[2]);
                 std::cout << bank.debit(tokens[1], amount) << "\n";
-            } catch (...) {
-                std::cout << "error: invalid amount\n";
+            } catch (const std::invalid_argument&) {
+                std::cout << "error: invalid amount format\n";
+            } catch (const std::out_of_range&) {
+                std::cout << "error: amount out of range\n";
             }
         }
         else if (cmd == "statement") {
@@ -121,8 +126,10 @@ int main() {
             if (tokens.size() >= 3) {
                 try {
                     lines = std::stoi(tokens[2]);
-                } catch (...) {
-                    lines = 10;
+                } catch (const std::invalid_argument&) {
+                    std::cout << "warning: invalid lines parameter, using default (10)\n";
+                } catch (const std::out_of_range&) {
+                    std::cout << "warning: lines parameter out of range, using default (10)\n";
                 }
             }
             std::cout << bank.getStatement(tokens[1], lines);

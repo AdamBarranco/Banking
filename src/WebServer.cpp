@@ -28,6 +28,23 @@ void HttpResponse::setJs(const std::string& js) {
     body = js;
 }
 
+namespace {
+std::string escapeJsonString(const std::string& str) {
+    std::string result;
+    for (char c : str) {
+        switch (c) {
+            case '"': result += "\\\""; break;
+            case '\\': result += "\\\\"; break;
+            case '\n': result += "\\n"; break;
+            case '\r': result += "\\r"; break;
+            case '\t': result += "\\t"; break;
+            default: result += c;
+        }
+    }
+    return result;
+}
+}
+
 void HttpResponse::setNotFound() {
     statusCode = 404;
     statusText = "Not Found";
@@ -37,13 +54,13 @@ void HttpResponse::setNotFound() {
 void HttpResponse::setBadRequest(const std::string& message) {
     statusCode = 400;
     statusText = "Bad Request";
-    setJson("{\"error\": \"" + message + "\"}");
+    setJson("{\"error\": \"" + escapeJsonString(message) + "\"}");
 }
 
 void HttpResponse::setInternalError(const std::string& message) {
     statusCode = 500;
     statusText = "Internal Server Error";
-    setJson("{\"error\": \"" + message + "\"}");
+    setJson("{\"error\": \"" + escapeJsonString(message) + "\"}");
 }
 
 WebServer::WebServer(int port) : port_(port), serverSocket_(-1), running_(false) {}
